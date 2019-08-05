@@ -1,6 +1,7 @@
 # Logs
 logs
 *.log
+newrelic_agent.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -29,18 +30,22 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
+# Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
 # Dependency directories
 node_modules/
 jspm_packages/
 
-# TypeScript v1 declaration files
+# Typescript v1 declaration files
 typings/
 
 # Optional npm cache directory
 .npm
+
+# TSOA auto-generated files
+src/routes.ts
+**/routes.ts
 
 # Optional eslint cache
 .eslintcache
@@ -54,8 +59,33 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# dotenv and direnv environment variables file
 .env
+.envrc
 
-# next.js build output
-.next
+# local development
+### scratch folders (if applicable)
+dev-*
+
+# Finder metadata
+.DS_Store
+
+# Jetbrains stuff
+.idea
+
+# CI Related
+ci/credentials.yml
+
+# Build target folder
+.build/
+build/
+.dist/
+dist/
+
+# Temp directory
+.tmp
+
+# Serverless
+.build
+.serverless
+.webpack
