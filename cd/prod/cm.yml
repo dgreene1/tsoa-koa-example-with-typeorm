@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{NAMESPACE}}-configmap-{{K8S_ENV}}"
+  labels:
+    env: "{{K8S_ENV}}"
+data:
+  NODE_ENV: production
+  TZ: UTC
+  DB_HOST: REPLACE_ME
+  LOG_LEVEL: debug
+  AWS_BUCKET: REPLACE_ME
+

@@ -1,0 +1,14 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "{{NAMESPACE}}-hpa-{{K8S_ENV}}"
+  labels:
+    env: "{{K8S_ENV}}"
+spec:
+  maxReplicas: 20
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 70
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: "{{NAMESPACE}}-deployment-{{K8S_ENV}}"

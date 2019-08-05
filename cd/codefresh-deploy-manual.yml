@@ -1,0 +1,63 @@
+version: '1.0'
+mode: parallel
+stages: [ 'prepare', 'support', 'deploy', 'notify' ]
+
+steps:
+
+  main_clone:
+    title: Cloning main repository...
+    type: git-clone
+    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
+    revision: '${{CF_REVISION}}'
+    stage: prepare
+    git: REPLACE_ME
+
+  fail_if_not_master:
+    when:
+      branch: {ignore: ['master']}
+      steps: [{name: main_clone, on: [success]}]
+    title: "Validate running on master branch"
+    image: codefresh/build-cli
+    commands: [ 'echo This pipeline should be run only on master && exit 1' ]
+
+  Setup:
+    when:
+      branch: {only: ['master']}
+      steps: [{name: main_clone, on: [success]}]
+    image: mikefarah/yq
+    working_directory: ./cd/${{K8S_ENV}}
+    commands:
+    - apk add --update --no-cache jq
+    - printf '\n---\n' | tee split.yml # Document Seperator
+    - cf_export NAMESPACE=$(echo "${{CF_REPO_NAME}}" | tr '[:upper:]' [:lower:]) # Convert Repo name to lowercase
+    - cat cm.yml split.yml hpa.yml split.yml ingress.yml split.yml service.yml > ${{CF_VOLUME_PATH}}/${{K8S_ENV}}.yml # Concat files together
+
+  DeploySupportingFiles:
+    when: {steps: [{name: Setup, on: [success]}]}
+    stage: support
+    type: deploy
+    kind: kubernetes
+    cluster: ${{CLUSTER_ENV}}
+    namespace: ${{NAMESPACE}}
+    file_path: '${{CF_VOLUME_PATH}}/${{K8S_ENV}}.yml'
+
+  DeployWorkload:
+    when: {steps: [{name: DeploySupportingFiles, on: [success]}]}
+    stage: deploy
+    type: deploy
+    kind: kubernetes
+    cluster: ${{CLUSTER_ENV}}
+    namespace: ${{NAMESPACE}}
+    file_path: 'cd/${{K8S_ENV}}/deploy.yml'
+
+  slack-notify-failure:
+    when: {condition: {all: {result: 'workflow.result == ''failure'''}}}
+    stage: notify
+    image: cfcommunity/slack-notification-resource
+    commands: [ 'echo ${{SLACK_FAILURE}} | /opt/resource/out .' ]
+
+  slack-notify-success:
+    when: {condition: {all: {result: 'workflow.result == ''success'''}}}
+    stage: notify
+    image: cfcommunity/slack-notification-resource
+    commands: [ 'echo ${{SLACK_SUCCESS}} | /opt/resource/out .' ]

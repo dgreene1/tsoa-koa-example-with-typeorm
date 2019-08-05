@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{NAMESPACE}}-configmap-{{K8S_ENV}}"
+  labels:
+    env: "{{K8S_ENV}}"
+data:
+  BASE_URL: REPLACE_ME
+  NODE_ENV: stage
+  TZ: UTC
+  LOG_LEVEL: debug
+  AWS_BUCKET: stg.msvc-example-service.1

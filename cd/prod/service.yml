@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: "{{NAMESPACE}}-service-{{K8S_ENV}}"
+  labels:
+    env: "{{K8S_ENV}}"
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+  selector:  {app: "{{NAMESPACE}}-{{K8S_ENV}}"}
+  type: ClusterIP
+  sessionAffinity: None

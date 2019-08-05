@@ -1,0 +1,36 @@
+{
+	"compilerOptions": {
+        "allowJs": true,
+		"module": "commonjs",
+        "target": "es2017",
+        "strict": true,
+        "strictPropertyInitialization": false, // I'm sad that we have to set this to false, but it's due to https://github.com/typeorm/typeorm/issues/1772#issuecomment-514787854
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"alwaysStrict": true,
+		"strictFunctionTypes": false,
+		"strictNullChecks": true,
+		"sourceMap": true,
+		"outDir": "./build",
+		"lib": ["es2017"],
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "noErrorTruncation": false, // https://github.com/Microsoft/TypeScript/issues/29597#issuecomment-496606844
+        "types": ["jest", "node"]
+	},
+	"compileOnSave": false,
+	"exclude": [
+		"coverage",
+		"node_modules",
+		"build",
+		"ts-node**",
+		"docs",
+		"dev-*",
+		"scripts",
+		"serverless"
+	],
+	"atom": {
+		"rewriteTsconfig": true
+	}
+}

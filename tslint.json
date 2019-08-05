@@ -1,0 +1,83 @@
+{
+	"extends": [
+		"tslint:recommended",
+		"tslint-config-prettier"
+    ],
+    "jsRules":{
+        "object-literal-sort-keys": false
+    },
+	"rules": {
+        "await-promise": true,
+        "adjacent-overload-signatures": true,
+        "curly": false,
+        "ban": [
+            true,
+            {"name": ["eval"], "message": "eval is a security risk."},
+            {"name": ["moment"], "message": "Please use a date library that is immutable such as JsJoda or Luxon"},
+            {"name": ["LocalDateTime", "now"], "message": "Please use our custom nowRelative function instead. The default now function doesn't require a Timezone. Our function does."},
+            {"name": ["ZonedDateTime", "now"], "message": "Please use our custom nowRelative function instead. The default now function doesn't require a Timezone. Our function does."},
+            {"name": ["ZonedDateTime", "parse"], "message": "Please use our custom parseRelative function instead. The default now function doesn't require a Timezone. Our function does."},
+            {"name": ["*","setSessionAttributes"], "message": "This is dangerous because it's both a race condition and un-type-safe. Instead, use makeTypeSafeSessionAttribute to create a type-safe getter/setter."},
+            {"name": ["_","groupBy"], "message": "Please uninstall lodash since we're already using ImmutableJS and we have to keep cold start times down for our Lambda"},
+            {"name": ["_","assign"], "message": "Please uninstall lodash since we're already using ImmutableJS and we have to keep cold start times down for our Lambda"},
+            {"name": ["_","map"], "message": "Please uninstall lodash since we're already using ImmutableJS and we have to keep cold start times down for our Lambda"},
+            {"name": ["test","each"], "message": "This breaks vscode-jest. Use 'describe.each' with an 'it' inside the loop. See here: https://github.com/jest-community/vscode-jest/issues/427"},
+            {"name": ["it","each"], "message": "This breaks vscode-jest. Use 'describe.each' with an 'it' inside the loop. See here: https://github.com/jest-community/vscode-jest/issues/427"}
+        ],
+        "interface-name": false,
+        "interface-over-type-literal": false,
+        "no-floating-promises": true,
+        "no-unused-expression": false,
+        "max-classes-per-file": false,
+        "no-any": {
+            "severity": "error"
+        },
+        "no-unsafe-any": {
+            "severity": "error"
+        },
+        "member-access": true,
+        "member-ordering": false,
+        "no-empty-interface": true,
+        "no-internal-module": true,
+        "no-magic-numbers": {
+            "options": [1, -1, 0, 100],
+            "severity": "warning"
+        },
+        "no-empty": false,
+        "no-debugger": {
+            "severity": "warning"
+        },
+        "no-namespace": false,
+        "no-non-null-assertion": true,
+        "no-reference": true,
+        "no-unnecessary-type-assertion": true,
+        "no-var-requires": true,
+        "one-variable-per-declaration": false,
+        "only-arrow-functions": false,
+        "object-literal-shorthand": false,
+		"object-literal-sort-keys": false,
+        "ordered-imports": false,
+        "promise-function-async": true,
+        "radix": false,
+        "no-bitwise": true,
+        "no-conditional-assignment": true,
+        "no-console": true,
+        "no-construct": true,
+        "no-dynamic-delete": true,
+        "no-var-keyword": true,
+        "no-invalid-template-strings": true,
+        "no-shadowed-variable": true,
+        "no-string-throw": true,
+        "no-switch-case-fall-through": true,
+        "no-unsafe-finally": true
+	},
+    "defaultSeverity": "error",
+    "linterOptions": {
+        "exclude": [
+            "node_modules/**/*",
+            "./**/*_spec*",
+            "./**/migration/**/*",
+            "./**/migrations/**/*"
+        ]
+    }
+}

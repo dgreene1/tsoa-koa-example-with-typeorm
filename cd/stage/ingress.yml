@@ -1,0 +1,16 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: "{{NAMESPACE}}-ingress-{{K8S_ENV}}"
+  labels:
+    env: "{{K8S_ENV}}"
+  annotations: {kubernetes.io/ingress.class: traefik}
+spec:
+  rules:
+    - host: REPLACE_ME
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: "{{NAMESPACE}}-service-{{K8S_ENV}}"
+            servicePort: 3000

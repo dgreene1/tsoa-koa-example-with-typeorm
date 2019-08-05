@@ -1,0 +1,27 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build routes and typescript",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "NODE_ENV": "${input:NODE_ENV}",
+                    "DEBUG": "koa*"
+                }
+            },
+            "command": "yarn run build"
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "NODE_ENV",
+            "description": "Which NODE_ENV would you like to run as?",
+            "options": ["test", "development", "stage", "production"],
+            "default": "development"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+	"APP_NAME": "msvc-example-service-svc-stage",
+    "TYPEORM_DATABASE": "REPLACE_ME",
+    "TYPEORM_USERNAME": "REPLACE_ME",
+    "TYPEORM_PASSWORD": "REPLACE_ME",
+    "TYPEORM_PASSWORD_COMMENT": "^ It's okay that we're storing the password for our local database since it's in-accessible to the world, it's ephemeral, and it should never have PII in it",
+	"API_YOU_NEED": "REPLACE_ME",
+    "OAUTH_CLIENT_ID": "REPLACE_ME",
+    "LOG_LEVEL": "debug",
+    "TYPEORM_LOGGING": "query",
+    "EXPOSE_STACK": "true",
+	"PRETTY_PRINT_LOGS": true
+}

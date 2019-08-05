@@ -1,0 +1,11 @@
+{
+    "APP_NAME": "msvc-example-service-svc-production",
+    "TYPEORM_DATABASE": "REPLACE_ME",
+    "TYPEORM_USERNAME": "REPLACE_ME",
+    "TYPEORM_PASSWORD_COMMENT": "^ don't store the password for the database in source control. It should be a secret in CodeFresh or Kubernetes",
+    "API_YOU_NEED": "REPLACE_ME",
+    "OAUTH_CLIENT_ID": "REPLACE_ME",
+	"EXPOSE_STACK": false,
+	"LOG_LEVEL": "info",
+	"PRETTY_PRINT_LOGS": false
+}

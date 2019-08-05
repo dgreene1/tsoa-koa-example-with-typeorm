@@ -1,0 +1,12 @@
+{
+    "APP_NAME": "msvc-example-service-svc-test",
+    "TYPEORM_DATABASE": "REPLACE_ME",
+    "TYPEORM_USERNAME": "REPLACE_ME",
+    "TYPEORM_PASSWORD": "Test password",
+	"API_YOU_NEED": "REPLACE_ME",
+    "OAUTH_CLIENT_ID": "REPLACE_ME",
+    "LOG_LEVEL": "debug",
+    "TYPEORM_LOGGING": "query",
+    "EXPOSE_STACK": "true",
+	"PRETTY_PRINT_LOGS": true
+}

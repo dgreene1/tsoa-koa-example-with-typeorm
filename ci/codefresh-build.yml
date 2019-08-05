@@ -1,0 +1,61 @@
+version: '1.0'
+mode: parallel
+stages: [ 'prepare', 'build', 'push', 'notify' ]
+
+steps:
+
+  main_clone:
+    title: Cloning main repository...
+    type: git-clone
+    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
+    revision: '${{CF_REVISION}}'
+    stage: prepare
+    git: REPLACE_ME
+
+  BumpTagVersion:
+    when: {steps: [{name: main_clone, on: [success]}]}
+    title: Bump Tag Version
+    image: ${{ECR}}/sys-tagging
+    commands: [ 'bump_tag_version.sh' ]
+
+  BuildingDockerImage:
+    when: {steps: [{name: BumpTagVersion, on: [success]}]}
+    title: Building Docker Image
+    stage: build
+    type: build
+    image_name: ${{QUAY_REPO}}
+    build_arguments:
+      - config=Release
+      - npmUri=${{npmUri}}
+      - npmAuthToken=${{npmAuthToken}}
+      - NODE_ENV=${{NODE_ENV}}
+
+  PushToDockerRegistry:
+    when:
+      branch: {only: ['${{DEFAULT_BRANCH}}']}
+      steps: [{name: BuildingDockerImage, on: [success]}]
+    title: Push to Quay, Only DEFAULT_BRANCH Branch
+    stage: push
+    type: push
+    candidate: "${{BuildingDockerImage}}"
+    tags: [ 'latest',"${{CF_BUILD_ID}}","${{TAG}}" ]
+    registry: quay
+
+  PushTag:
+    when: {steps: [{name: BuildingDockerImage, on: [success]}]}
+    title: Push Tag
+    stage: push
+    image: ${{ECR}}/sys-tagging
+    commands: [ 'push_tag.sh' ]
+
+  slack-notify-failure:
+    when: {condition: {all: {result: 'workflow.result == ''failure'''}}}
+    stage: notify
+    image: cfcommunity/slack-notification-resource
+    commands: [ 'echo ${{SLACK_FAILURE}} | /opt/resource/out .' ]
+
+  slack-notify-success:
+    when: {condition: {all: {result: 'workflow.result == ''success'''}}}
+    stage: notify
+    image: cfcommunity/slack-notification-resource
+    commands: [ 'echo ${{SLACK_SUCCESS}} | /opt/resource/out .' ]

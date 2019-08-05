@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9.6
+    container_name: postgres
+    environment:
+      POSTGRES_DB: REPLACE_ME
+      POSTGRES_USER: REPLACE_ME
+      POSTGRES_PASSWORD: REPLACE_ME
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  pgadmin:
+    build:
+      context: .
+      dockerfile: ./docker/pgadmin.dockerfile
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@REPLACE_ME.com
+      PGADMIN_DEFAULT_PASSWORD: REPLACE_ME
+    ports:
+      - 8000:80
+    restart: always
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - 8080:8080
+    restart: always
+
+  swaggerEditor:
+    image: swaggerapi/swagger-editor
+    container_name: swagger-editor
+    ports:
+      - 8081:8080
+    restart: always
+
+volumes:
+  db-data:

@@ -1,0 +1,62 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: "{{NAMESPACE}}-deployment-{{K8S_ENV}}"
+  labels:
+    env: "{{K8S_ENV}}"
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: "{{NAMESPACE}}-{{K8S_ENV}}"}}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels: {app: "{{NAMESPACE}}-{{K8S_ENV}}", env: "{{K8S_ENV}}", version: "{{IMAGE_TAG}}"}
+    spec:
+      securityContext: {}
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 30
+      imagePullSecrets: [{name: quay}]
+      schedulerName: default-scheduler
+      containers:
+        - name: "{{NAMESPACE}}"
+          image: "{{IMAGE_URL}}:{{IMAGE_TAG}}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1000Mi
+            requests:
+              cpu: 700m
+              memory: 700Mi
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+            periodSeconds: 20
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: "{{NAMESPACE}}-configmap-{{K8S_ENV}}"
+            - secretRef:
+                name: "{{NAMESPACE}}-secret-{{K8S_ENV}}"
