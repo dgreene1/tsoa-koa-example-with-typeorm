@@ -43,14 +43,13 @@ const stdout = execSync(
 	`ts-node ./node_modules/typeorm/cli migration:generate --dir ./src/db/migration --name ${failureArtifactName}`,
 );
 
-const outputAStr = stdout.toString();
+const internalErrFromTypeOrm = stdout.toString();
 
-if (!outputAStr.includes('No changes in database schema were found')) {
-	const generalErrMsg =
-		'Error: The developer either \n * forgot to create a migration script \n * or forgot to run the existing migrations';
-	const errorMsg = outputAStr.includes('generated successfully')
-		? `${generalErrMsg}\n * and/or there were other issues: ${outputAStr}`
-		: generalErrMsg;
+if (!internalErrFromTypeOrm.includes('No changes in database schema were found')) {
+    const errMsgToShow = 'Failure: The developer either \n * forgot to create a migration script ' +
+        '\n * or forgot to run the existing migrations ' +
+        '\n * or forgot to start the db and therefore we were unable to verify the schemas ' +
+        '\n Please read above to see the full error message.';
 
 	// Now delete the artifact since you don't want that to hang around
 	try {
@@ -59,8 +58,10 @@ if (!outputAStr.includes('No changes in database schema were found')) {
 	} catch (err) {
 		// tslint:disable-next-line: no-console
 		console.warn('Unable to cleanup the artifact due to this error: ' + err);
-	}
-	throw new Error(errorMsg);
+    }
+    // tslint:disable-next-line: no-console
+    console.error(internalErrFromTypeOrm);
+	throw new Error(errMsgToShow);
 } else {
 	// tslint:disable-next-line: no-console
 	console.log('Success: Schemas are up-to-date with the code.');
