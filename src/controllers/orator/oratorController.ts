@@ -1,7 +1,7 @@
 import { Get, Post, Route, Body, Query, Header, Path, SuccessResponse, Controller } from 'tsoa';
 import { IOratorCreationRequest, IOratorResponse } from './oratorSwaggerModels';
 import { saveNewOratorToDb, getOratorBySubject } from './oratorBusiness';
-import { ConnectionCreator } from '../../db/connectionCreator';
+import { makeOrGetConnectionAsync } from '../../db/connectionCreator';
 import { myLogger } from '../../agnosticUtilities/myLogger';
 
 @Route('orator')
@@ -22,7 +22,7 @@ export class OratorController extends Controller {
 			};
 		}
 
-		const dbConnection = await ConnectionCreator.makeOrGetAsync();
+		const dbConnection = await makeOrGetConnectionAsync();
 		return getOratorBySubject(
 			{
 				id: subjectId,
@@ -48,7 +48,7 @@ export class OratorController extends Controller {
 			};
 		}
 
-		const dbConnection = await ConnectionCreator.makeOrGetAsync();
+		const dbConnection = await makeOrGetConnectionAsync();
 		return saveNewOratorToDb(requestBody, dbConnection);
 	}
 }

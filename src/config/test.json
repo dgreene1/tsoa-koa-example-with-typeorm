@@ -1,5 +1,6 @@
 {
     "APP_NAME": "msvc-example-service-svc-test",
+    "MY_HOST_URL": "localhost",
     "TYPEORM_DATABASE": "REPLACE_ME",
     "TYPEORM_USERNAME": "REPLACE_ME",
     "TYPEORM_PASSWORD": "Test password",

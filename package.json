@@ -14,32 +14,6 @@
 			"coverage/*"
 		]
 	},
-	"nyc": {
-		"extension": [
-			".ts"
-		],
-		"exclude": [
-			"**/*.d.ts",
-			"**/*_spec.ts",
-			"build",
-			"scripts",
-			"dev-**",
-			"coverage",
-			"test/mocks",
-			"test/fixtures",
-			"test/util",
-			"src/api/consumer",
-			"src/db/entities",
-			"src/db/migrations",
-			"src/db/*.ts"
-		],
-		"reporter": [
-			"html",
-			"lcov",
-			"text"
-		],
-		"all": true
-	},
 	"husky": {
 		"hooks": {
 			"pre-commit": "lint-staged && yarn pre-commit"
@@ -52,9 +26,8 @@
 		]
 	},
 	"scripts": {
-		"build": "rimraf ./build && yarn tsoa:gen && tsc && mkdirp .tmp && yarn cp:configs && yarn cp:testfiles",
+		"build": "rimraf ./build && yarn tsoa:gen && tsc && mkdirp .tmp && yarn cp:configs",
 		"cp:configs": "cpx \"./src/config/*.json\" \"./build/src/config\"",
-		"cp:testfiles": "cpx src/test/fixtures/json/ ./build/test/fixtures/json",
 		"db:init": "docker-compose up -d && yarn run db:init:post-instructions",
 		"db:init:post-instructions": "echo 'Next you need to navigate to http://localhost:8000 then enter the email and password defined in docker-compose.yml's pgadmin.environment variables then create a server using the settings defined in docker-compose.yml's db.environment. Note: the ip address on windows will not be localhost, it will be whatever the result is of yarn run db:where-is-dev-db-running' ",
 		"db:where-is-dev-db-running": "docker inspect postgres --format=\"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}\"",
@@ -68,18 +41,18 @@
 		"db:destroy": "docker-compose down --volumes",
 		"dev-server": "mkdirp .tmp && cross-env NODE_ENV=development nodemon --inspect --nolazy -r ts-node/register -- src/index.ts",
 		"dev-server:debug": "cross-env DEBUG=di-* yarn dev-server",
-		"docker:build": "docker build -t msvc-example-service .",
-		"docker:run": "docker run -p 3000:5555 msvc-example-service",
+		"docker:build": "docker build -t msvc-voice-settings .",
+		"docker:run": "docker run -p 3000:5555 msvc-voice-settings",
 		"lint": "tslint --project .",
 		"start": "cross-env PORT=3000 node build/src/index.js",
 		"start:dev": "cross-env NODE_ENV=development yarn build && cross-env NODE_ENV=development node build/src/index.js",
-		"tsoa:gen": "ts-node tsoaCustom.ts",
-		"available-routes": "ts-node src/util/available-routes.ts",
-		"test": "cross-env ENV_FILE_NAME=test tsc && jest --collectCoverage",
+		"tsoa:gen": "ts-node tsoaCustomCli.ts --all",
+		"pretest": "cross-env NODE_ENV=test yarn build",
+		"test": "cross-env NODE_ENV=test tsc && cross-env NODE_ENV=test jest --collectCoverage --runInBand",
 		"test:debug:osx": "node --inspect node_modules/.bin/jest --runInBand",
 		"test:debug:windows": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
 		"test:verbose": "cross-env LOG_LEVEL=debug PRETTY_PRINT_LOGS=true yarn test",
-		"pre-commit": "echo 'Please DO NOT SKIP this hook since it runs automation that can not be run elsewhere!!!' && tsc && yarn db:migrate:diff && yarn lint && yarn run test",
+		"pre-commit": "echo 'Please DO NOT SKIP this hook since it runs automation that can not be run elsewhere!!!' && cross-env NODE_ENV=test yarn build && yarn db:migrate:diff && yarn lint && yarn run test",
 		"tsnode": "node -r ts-node/register"
 	},
 	"license": "UNLICENSED",
@@ -87,7 +60,6 @@
 	"contributors": [],
 	"dependencies": {
 		"@hapi/boom": "^7.4.2",
-		"@types/koa-static": "^4.0.1",
 		"axios": "^0.18.0",
 		"chalk": "^2.4.2",
 		"cross-env": "^5.2.0",
@@ -112,7 +84,8 @@
 		"prom-client": "^11.0.0",
 		"query-string": "^6.1.0",
 		"shortid": "^2.2.8",
-		"tsoa": "^2.3.81",
+		"supertest": "^4.0.2",
+		"tsoa": "^2.4.11",
 		"typeorm": "^0.2.18",
 		"utility-types": "^3.7.0",
 		"uuid": "^3.3.2"
@@ -128,12 +101,15 @@
 		"@types/koa-bodyparser": "^4.2.0",
 		"@types/koa-compress": "^2.0.8",
 		"@types/koa-router": "^7.0.28",
+		"@types/koa-static": "^4.0.1",
 		"@types/lodash": "^4.14.109",
 		"@types/nconf": "^0.0.37",
 		"@types/node": "^10.3.3",
 		"@types/pino": "^5.8.8",
 		"@types/query-string": "^5.1.0",
 		"@types/shortid": "^0.0.29",
+		"@types/sql.js": "^1.0.1",
+		"@types/supertest": "^2.0.8",
 		"@types/uuid": "^3.4.5",
 		"axios-mock-adapter": "^1.15.0",
 		"cpx": "^1.5.0",
@@ -141,12 +117,13 @@
 		"husky": "^1.0.1",
 		"jest": "^24.8.0",
 		"koa-sslify": "^2.1.2",
-		"lint-staged": "^7.1.2",
+		"lint-staged": "^9.2.3",
 		"mkdirp": "^0.5.1",
 		"nodemon": "^1.17.5",
 		"npm": "^6.0.1",
 		"prettier": "^1.12.1",
 		"rimraf": "^2.6.3",
+		"sql.js": "^1.0.0",
 		"ts-jest": "^24.0.2",
 		"ts-node": "^6.0.3",
 		"tslint": "^5.10.0",

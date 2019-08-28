@@ -39,18 +39,7 @@ const findFileInNestedPath = (startingDir: string, fileNameSection: string): str
 	return results[0];
 };
 
-const stdout = execSync(
-	`ts-node ./node_modules/typeorm/cli migration:generate --dir ./src/db/migration --name ${failureArtifactName}`,
-);
-
-const internalErrFromTypeOrm = stdout.toString();
-
-if (!internalErrFromTypeOrm.includes('No changes in database schema were found')) {
-    const errMsgToShow = 'Failure: The developer either \n * forgot to create a migration script ' +
-        '\n * or forgot to run the existing migrations ' +
-        '\n * or forgot to start the db and therefore we were unable to verify the schemas ' +
-        '\n Please read above to see the full error message.';
-
+function throwAndExit(errMsgToShow: string): void {
 	// Now delete the artifact since you don't want that to hang around
 	try {
 		const pathOfArtifact = findFileInNestedPath('.', failureArtifactName);
@@ -58,10 +47,31 @@ if (!internalErrFromTypeOrm.includes('No changes in database schema were found')
 	} catch (err) {
 		// tslint:disable-next-line: no-console
 		console.warn('Unable to cleanup the artifact due to this error: ' + err);
-    }
-    // tslint:disable-next-line: no-console
-    console.error(internalErrFromTypeOrm);
+	}
+	// tslint:disable-next-line: no-console
+	console.error(internalErrFromTypeOrm);
 	throw new Error(errMsgToShow);
+}
+
+const stdout = execSync(
+	`ts-node ./node_modules/typeorm/cli migration:generate --dir ./src/db/migration --name ${failureArtifactName}`,
+);
+
+const internalErrFromTypeOrm = stdout.toString();
+
+if (!internalErrFromTypeOrm.includes('No changes in database schema were found')) {
+	if (!internalErrFromTypeOrm.includes('ECONNREFUSED')) {
+		throwAndExit(
+			`Unable to run this quality check because the DB is either down or configured improperly. Please review the full error message: ${internalErrFromTypeOrm}`,
+		);
+	}
+	const errMsgToShow =
+		'Failure: The developer either \n * forgot to create a migration script ' +
+		'\n * or forgot to run the existing migrations ' +
+		'\n * or forgot to start the db and therefore we were unable to verify the schemas ' +
+		'\n Please read above to see the full error message.';
+
+	throwAndExit(errMsgToShow);
 } else {
 	// tslint:disable-next-line: no-console
 	console.log('Success: Schemas are up-to-date with the code.');

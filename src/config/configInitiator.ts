@@ -9,7 +9,8 @@ const rightSideDoesNotMatter =
  * Add to this whenever you want to force configInitiator to verify the presence of an environment variable on startup
  */
 export const requiredEnvVars = {
-	APP_NAME: rightSideDoesNotMatter,
+    APP_NAME: rightSideDoesNotMatter,
+    MY_HOST_URL: rightSideDoesNotMatter,
 	LOG_LEVEL: rightSideDoesNotMatter,
 	EXPOSE_STACK: rightSideDoesNotMatter,
 	TYPEORM_DATABASE: rightSideDoesNotMatter,

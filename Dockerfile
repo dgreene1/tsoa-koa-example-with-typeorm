@@ -21,6 +21,7 @@ RUN yarn
 FROM node:10.15.3-alpine AS build
 
 ARG NODE_ENV
+ARG TYPEORM_PASSWORD
 
 COPY . /build
 WORKDIR /build
@@ -33,6 +34,7 @@ RUN yarn run build
 FROM node:10.15.3-alpine AS test
 
 ARG NODE_ENV
+ARG TYPEORM_PASSWORD
 
 COPY . /tests
 WORKDIR /tests
@@ -48,6 +50,7 @@ RUN yarn run test
 FROM build AS release
 
 ARG NODE_ENV
+ARG TYPEORM_PASSWORD
 
 WORKDIR /app
 

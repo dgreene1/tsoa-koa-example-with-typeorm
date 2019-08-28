@@ -14,6 +14,8 @@ import * as gzip from 'koa-compress';
 import * as prometheus from 'prom-client';
 import * as Boom from '@hapi/boom';
 import * as path from 'path';
+import * as http from 'http';
+import { existsSync } from 'fs';
 import { KoaSwaggerUiOptions } from 'koa2-swagger-ui';
 type koa2SwaggerUiFunc = (config: Partial<KoaSwaggerUiOptions>) => Koa.Middleware;
 // tslint:disable-next-line: no-var-requires // We actually have to do this for koa2-swagger-ui
@@ -40,7 +42,8 @@ process.on(
 );
 
 const app = new Koa();
-const hostname = 'localhost';
+const listenToAllHostNames = '0.0.0.0';
+const specificHostname = envVars.get('MY_HOST_URL');
 const PORT_THAT_WILL_WORK_WITH_SWAGGER_UI = 3000;
 if (process.env.PORT && parseInt(process.env.PORT) !== PORT_THAT_WILL_WORK_WITH_SWAGGER_UI) {
 	throw new Error(`The only port that will work with the swagger UI is ${PORT_THAT_WILL_WORK_WITH_SWAGGER_UI}`);
@@ -62,20 +65,30 @@ app.use(router.routes()).use(router.allowedMethods());
 // #######
 
 const SWAGGER_DIR_TO_SERVE = path.join(__dirname, '..', 'staticFilesToBeServed');
+const swaggerDocPath = path.join(SWAGGER_DIR_TO_SERVE, 'swagger.yaml');
+if (process.env.NODE_ENV !== 'test' && !existsSync(swaggerDocPath)) {
+    throw new Error(`Could not locate this file: ${swaggerDocPath}`);
+}
 app.use(koaStatic(SWAGGER_DIR_TO_SERVE));
 
-const swaggerRoutePrefix = '/swagger';
-const oauth2RedirectUrl = `http://${hostname}:${port}${swaggerRoutePrefix}`;
+const SWAGGER_UI_ROUTE = '/swagger';
+
+const oauth2RedirectUrl = `http://${specificHostname}:${port}${SWAGGER_UI_ROUTE}`;
+const runningUrl = specificHostname.includes('localhost')
+    ? `http://${specificHostname}:${port}/`
+    : `${specificHostname}/`;
+const swaggerDocUrl = runningUrl + 'swagger.yaml';
+
 app.use(
 	koaSwagger({
-		routePrefix: swaggerRoutePrefix, // host at /swagger instead of default /docs
+		routePrefix: SWAGGER_UI_ROUTE, // host at /swagger instead of default /docs
 		oauthOptions: {
 			// as defined in https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
 			clientId: envVars.get('OAUTH_CLIENT_ID'),
 		},
 		hideTopbar: true,
 		swaggerOptions: {
-			url: `http://${hostname}:${port}/swagger.yaml`,
+			url: `http://${specificHostname}:${port}/swagger.yaml`,
 			oauth2RedirectUrl: oauth2RedirectUrl,
 			showRequestHeaders: true,
 			jsonEditor: true,
@@ -87,9 +100,23 @@ app.use(
 
 app.use(MAKE_ME_LAST.fourOhFourLogger); // <-- seriously, if you put this before other middleware... that middleware will not be hit
 
-export const server = app.listen(port, hostname, undefined, () => {
-	const runningUrl = `${hostname}:${port}`;
-	myLogger.info(
-		`App started. Listening at ${runningUrl} and if you'd like to access the swagger page please visit ${runningUrl}/swagger`,
-	);
-});
+const createAndRunServer = (): http.Server => {
+	return app.listen(port, listenToAllHostNames, undefined, () => {
+		myLogger.info(
+			`App started. Listening at ${runningUrl} and if you'd like to access the swagger page please visit ${runningUrl}swagger`,
+		);
+	});
+};
+
+if (process.env.NODE_ENV !== 'test') {
+	createAndRunServer();
+}
+
+export const getUnStartedApp = () => {
+	if (process.env.NODE_ENV !== 'test') {
+		throw new Error(
+			'Since you were not running in test mode, then there will be no way to provide an unstarted application server',
+		);
+	}
+	return app;
+};

@@ -1,5 +1,6 @@
 {
-	"APP_NAME": "msvc-example-service-svc-stage",
+    "APP_NAME": "msvc-example-service-svc-stage",
+    "MY_HOST_URL": "REPLACE_ME",
     "TYPEORM_DATABASE": "REPLACE_ME",
     "TYPEORM_USERNAME": "REPLACE_ME",
     "TYPEORM_PASSWORD_COMMENT": "^ don't store the password for the database in source control. It should be a secret in CodeFresh or Kubernetes",

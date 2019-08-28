@@ -1,5 +1,5 @@
 import { Controller, Route, Get } from 'tsoa';
-import { ConnectionCreator } from './../db/connectionCreator';
+import { makeOrGetConnectionAsync } from './../db/connectionCreator';
 
 /**
  * @tsoaModel
@@ -13,7 +13,7 @@ export class HealthController extends Controller {
 	@Get()
 	public async getHealthCheckResponse(): Promise<IHealthResponse> {
 		// Don't admit that we're healthy/up until we have a connection to the Database
-		const connection = await ConnectionCreator.makeOrGetAsync();
+		const connection = await makeOrGetConnectionAsync();
 
 		if (connection.isConnected) {
 			return Promise.resolve({
