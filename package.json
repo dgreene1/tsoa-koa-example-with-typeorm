@@ -60,7 +60,7 @@
 	"contributors": [],
 	"dependencies": {
 		"@hapi/boom": "^7.4.2",
-		"axios": "^0.18.0",
+		"axios": "^0.21.1",
 		"chalk": "^2.4.2",
 		"cross-env": "^5.2.0",
 		"http-errors": "^1.7.3",
