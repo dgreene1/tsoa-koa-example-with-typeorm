@@ -86,7 +86,7 @@
 		"shortid": "^2.2.8",
 		"supertest": "^4.0.2",
 		"tsoa": "^2.4.11",
-		"typeorm": "^0.2.18",
+		"typeorm": "^0.2.25",
 		"utility-types": "^3.7.0",
 		"uuid": "^3.3.2"
 	},
